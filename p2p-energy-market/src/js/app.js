@@ -1,6 +1,7 @@
 App = {
   web3Provider: null,
   contracts: {},
+  period: 0,
 
   init: async function() {
     return await App.initWeb3();
@@ -50,6 +51,12 @@ App = {
     else {
       var _rate = 1;
     }
+
+    if ($('#battery :selected').text() == "Not installed") {
+      var _battery = 0;} 
+    else {
+      var _battery = 1;
+    }
   
     var _solar_capacity = parseInt($('#solar_capacity').val());
     
@@ -62,13 +69,102 @@ App = {
 
       App.contracts.EnergyMarket.deployed().then(function(instance) {
         EnergyMarketInstance = instance;
-        return EnergyMarketInstance.register(_rate, _solar_capacity, {from: account});
+        return EnergyMarketInstance.register(_rate, _solar_capacity, _battery, {from: account});
+      }).then(function(result) {alert(result)
+      }).catch(function(err) {
+        alert(err);
+      });
+    });
+  },
+
+  setBidAsk: function() {
+    var EnergyMarketInstance;
+    var _bidpeak = parseInt($('#bid_peak').val());
+    var _bidoffpeak = parseInt($('#bid_offpeak').val());
+    var _askpeak = parseInt($('#ask_peak').val());
+    var _askoffpeak = parseInt($('#ask_offpeak').val());
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+
+      App.contracts.EnergyMarket.deployed().then(function(instance) {
+        EnergyMarketInstance = instance;
+        return EnergyMarketInstance.setBidAsk(_bidpeak, _bidoffpeak, _askpeak, _askoffpeak, {from: account});
       }).then(function(result) {
       }).catch(function(err) {
         alert(err);
       });
     });
-  }
+
+  },
+
+  userData: function() {
+    var _rate; var _battery; 
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+      var account = accounts[0];
+        App.contracts.EnergyMarket.deployed().then(function(instance) {
+          EnergyMarketInstance = instance;
+          return EnergyMarketInstance.userData({from: account});
+        }).then(function(result) {
+          if (result[0] == 0){_rate = "Flat Rate"} else {_rate = "TOU rate"}
+          if (result[2] == 0){_battery = "Not installed"} else {_battery = "Installed"}
+
+          alert(["Rate: "+_rate, "\r\nBattery storage: "+_battery, "\r\nBattery Charge: "+result[3],
+                 "\r\nBid - Peak: "+result[4], "\r\nBid - Off Peak: "+result[5], "\r\nAsk - Peak: "+result[6],
+                 "\r\nAsk - Off Peak: "+result[7], "\r\nSolar Capacity (kW): "+result[9], "\r\nBalance: "+result[11]])
+        }).catch(function(err) {
+          alert(err);
+        });
+    });
+   },
+
+  clearMarket: function(){
+    var irradiance; var demand = []; var periodtype = 0;
+    $.ajaxSetup({
+      async: false
+     });
+    $.getJSON('../demand.json', function(data){
+      for (i = 0; i < 20; i ++) {
+        demand.push(data[App.period+1][i])
+      }
+    });
+
+    $.getJSON('../irradiance.json', function(data){
+        irradiance = data.Irradiance[App.period]
+    });
+
+    // Peak period defined as between 8am to 10pm. 0 if off peak, 1 if peak
+    if ((App.period+1)%24 >= 8 && (App.period+1)%24 <= 22) {
+       periodtype = 1;}
+    else {periodtype = 0;}
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+
+      App.contracts.EnergyMarket.deployed().then(function(instance) {
+        EnergyMarketInstance = instance;
+        return EnergyMarketInstance.clearMarket(demand, irradiance, periodtype, {from: account});
+      }).then(function(result) {alert("Market Cleared!")
+      }).catch(function(err) {
+        alert(err);
+      });
+    });
+
+    App.period++
+
+   }
 
 };
 

@@ -26,20 +26,78 @@
           <br/>
         </div>
       </div>
+
       <div class="row">
         <div class="col-md-4">
-          <label for="rate">Select your utility rate:</label>
-          <select id="rate" name="rate">
-            <option value="Flat">Flat</option>
-            <option value="TOU">TOU</option>
-          </select>
+          <div class="panel panel-primary">
+            <div class="panel-heading text-center">
+              <h1 class="panel-title" style="font-size: large;">New Users</h1>
+            </div>
+            <div class="panel-body">
+              <label for="rate">Select your utility rate:</label>
+              <select id="rate" name="rate">
+                <option value="0">Flat</option>
+                <option value="1">TOU</option>
+              </select><br/><br/>
+              <label for="battery">Battery storage system:</label>
+              <select id="battery" name="battery">
+                <option value="0">Not installed</option>
+                <option value="1">Installed</option>
+              </select><br/><br/>
+              <label for="solar_capacity">Solar capacity (kW):</label>
+              <input type="number" id="solar_capacity" name="solar_capacity"><br/><br/>
+              <div class="text-center">
+              <button type="button" class="btn btn-primary btn-md" onclick="App.register(); return false;">Register</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-4">
-          <label for="solar_capacity">Solar capacity (kW):</label>
-          <input type="number" id="solar_capacity" name="solar_capacity"><br><br>
+        
+        <div class="col-md-8">
+          <div class="panel panel-primary">
+          <div class="panel-heading text-center">
+            <h1 class="panel-title" style="font-size: large;">Registered Users</h1>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+            <div class="col-md-3">
+              <label for="bid_peak">Bid - Peak (c/kWh):</label>
+              <input type="number" id="bid_peak" name="bid_peak"><br/>
+              <label for="bid_offpeak">Bid - Off Peak (c/kWh):</label>
+              <input type="number" id="bid_offpeak" name="bid_offpeak"><br/>
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-3">
+              <label for="ask_peak">Ask - Peak (c/kWh):</label>
+              <input type="number" id="ask_peak" name="ask_peak"><br/>
+              <label for="ask_offpeak">Ask - Off Peak (c/kWh):</label>
+              <input type="number" id="ask_offpeak" name="ask_offpeak"><br/>
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-4">
+              <p>Flat rate: <strong>20 c/kWh</strong></p>
+              <p>TOU peak period: <strong>8am-10pm</strong></p>
+              <p>TOU peak: <strong>30 c/kWh</strong></p>
+              <p>TOU off peak: <strong>3 c/kWh</strong></p>
+              <p>Solar FiT: <strong>10 c/kWh</strong></p>
+            </div>
+            </div>
+            <div class="row">
+            <div class="text-center">
+            <button type="button" class="btn btn-primary btn-md" onclick="App.setBidAsk(); return false;">Set Bid-Ask Prices</button>
+            <button type="button" class="btn btn-primary btn-md" onclick="App.userData(); return false;">See Current Settings</button>
+            </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-4">
-          <button type="button" class="btn btn-primary" onclick="App.register(); return false;">Register</button>
+
+      </div>
+      <br><br>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="text-center">
+            <button type="button" class="btn btn-success btn-lg" onclick="App.clearMarket(); return false;">Clear Market</button>
+            </div>
         </div>
       </div>
 
